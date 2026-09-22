@@ -1,3 +1,7 @@
-/.vscode/
-/data/
+.vscode/
+data/
 vega.log
+__pycache__/
+*.pyc
+data/
+config.py
