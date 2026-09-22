@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""HTTP-сервер: диспетчеризация запросов и отправка ответов.
+"""HTTP-сервер Vegas: диспетчеризация запросов и отправка ответов.
 
 Единственная точка, где живёт BaseHTTPRequestHandler. Всё остальное
 (модули, UI, сервисы) работает только с Request/Response из core/http.py.
@@ -27,7 +27,7 @@ def _not_found_response():
                        status=404)
 
 
-class G1Handler(BaseHTTPRequestHandler):
+class VegasHandler(BaseHTTPRequestHandler):
     """Принимает запрос, находит обработчик в роутере, отправляет Response."""
 
     protocol_version = "HTTP/1.1"
@@ -108,7 +108,7 @@ def serve(router):
     from app.services import storage, llm
 
     storage.ensure_dirs()
-    G1Handler.router = router
+    VegasHandler.router = router
 
     # Автоопределение модели для Веги (если задано openai и модель пуста).
     if config.LLM_URL and config.LLM_STYLE == "openai" and not config.LLM_MODEL:
@@ -117,8 +117,8 @@ def serve(router):
               else "ВНИМАНИЕ: не удалось автоопределить модель — задай LLM_MODEL вручную.",
               flush=True)
 
-    srv = ThreadingHTTPServer((config.HOST, config.PORT), G1Handler)
-    print("Мини-портал запущен: http://%s:%d" % (config.HOST, config.PORT), flush=True)
+    srv = ThreadingHTTPServer((config.HOST, config.PORT), VegasHandler)
+    print("Портал Vegas запущен: http://%s:%d" % (config.HOST, config.PORT), flush=True)
     print("Вкладки: " + " | ".join(n for _, n in config.TABS), flush=True)
     if not config.LLM_URL:
         print("ВНИМАНИЕ: Вега не настроена (LLM_URL пуст) — см. app/config.py", flush=True)

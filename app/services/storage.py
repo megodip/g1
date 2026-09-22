@@ -23,7 +23,8 @@ LOCK = threading.Lock()
 
 # ============================== ПАПКИ ========================================
 def ensure_dirs():
-    for d in (config.DATA_DIR, config.DL_DIR, config.ARCHIVE_DIR):
+    for d in (config.DATA_DIR, config.DL_DIR, config.ARCHIVE_DIR,
+              config.LIB_DIR):
         os.makedirs(d, exist_ok=True)
 
 

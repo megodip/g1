@@ -15,12 +15,14 @@ from html import escape
 
 from app import config
 
-# Компактная таблица стилей: чёрный текст на белом, высокий контраст,
-# читаемо даже на монохромных и маленьких экранах.
+# Компактная таблица стилей: шапка — чёрная с белым текстом, тело —
+# чёрный текст на белом, высокий контраст, читаемо даже на монохромных экранах.
 CSS = """body{background:#fff;color:#000;margin:3px auto;max-width:480px;
 font:14px/1.4 Arial,sans-serif}
-.nav{border-bottom:1px solid #888;margin:0 0 5px;padding:0 0 4px}
-.nav a,.nav b{margin-right:3px;white-space:nowrap}
+.hdr{background:#000;color:#fff;padding:4px;margin:0 0 6px}
+.hdr a,.hdr b{color:#fff;margin-right:3px;white-space:nowrap}
+.hdr a:visited{color:#fff}
+.brand{font-size:16px;font-weight:bold;letter-spacing:1px}
 a{color:#0046b0}
 h1{font-size:16px;margin:3px 0 5px}
 h2{font-size:14px;margin:8px 0 3px}
@@ -36,7 +38,8 @@ hr{border:0;border-top:1px solid #aaa;margin:6px 0}"""
 
 
 def nav_html(active):
-    """Строка навигации с номерами: 1.Поиск 2.Загрузки ..."""
+    """Чёрная шапка: название портала + нумерованные вкладки
+    (1.Поиск 2.Загрузки ...), белый текст на чёрном фоне."""
     parts = []
     for num, (key, name) in enumerate(config.TABS, 1):
         if key == active:
@@ -44,7 +47,8 @@ def nav_html(active):
         else:
             parts.append('<a href="/%s" accesskey="%d">%d.%s</a>'
                          % (key, num, num, escape(name)))
-    return '<div class="nav">%s</div>' % " ".join(parts)
+    return ('<div class="hdr"><span class="brand">%s</span><br>%s</div>'
+            % (escape(config.SITE_NAME), " ".join(parts)))
 
 
 def _shell(title, body, refresh=0):
@@ -60,9 +64,10 @@ def _shell(title, body, refresh=0):
 
 
 def page(title, active, body, refresh=0, cache=None, status=200, cookies=()):
-    """Обычная страница портала: навигация + тело. Это ответ модуля."""
+    """Обычная страница портала: шапка + тело. Это ответ модуля."""
     from app.core.http import Response
-    return Response.html(_shell(title, nav_html(active) + body, refresh),
+    return Response.html(_shell("%s · %s" % (config.SITE_NAME, title),
+                                nav_html(active) + body, refresh),
                          status=status, cookies=cookies, cache=cache)
 
 

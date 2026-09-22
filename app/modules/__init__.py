@@ -13,9 +13,10 @@
 from app.modules import search
 from app.modules import reader
 from app.modules import downloads
-from app.modules import books
+from app.modules import library
+from app.modules import flibusta
 from app.modules import chat
 from app.modules import archive
 from app.modules import vega
 
-MODULES = [search, reader, downloads, books, chat, archive, vega]
+MODULES = [search, reader, downloads, library, flibusta, chat, archive, vega]

@@ -66,6 +66,7 @@ def messages_page(all_messages, page):
     """Нарезает историю на страницы. Страница 1 — самые свежие.
 
     Возвращает (сообщения_страницы_в_хронологии, current, total_pages).
+    Порядок отображения (новые сверху) обеспечивает render_messages.
     """
     size = config.CHAT_PAGE_SIZE
     total_pages = max(1, (len(all_messages) + size - 1) // size)
@@ -76,13 +77,14 @@ def messages_page(all_messages, page):
 
 
 def render_messages(messages):
-    """HTML-блок сообщений (в хронологическом порядке)."""
+    """HTML-блок сообщений. НОВЫЕ СВЕРХУ: список приходит в хронологии,
+    при выводе переворачиваем, чтобы последнее сообщение было первым."""
     if not messages:
         return '<div class="small">Сообщений пока нет.</div>'
     return "".join(
         components.chat_row(m.get("n", "?"), m.get("x", ""), fmt_time(m.get("t", 0)),
                             nick_color(m.get("n", "?")))
-        for m in messages)
+        for m in reversed(messages))
 
 
 # ============================== Страницы =====================================
@@ -158,6 +160,7 @@ def pg_simple(req):
     вручную по ссылке (или после отправки сообщения).
     """
     nick = get_nick(req)
+    # последние N сообщений; render_messages сам поставит новые сверху
     msgs = storage.chat_load()[-config.CHAT_SIMPLE_COUNT:]
 
     # Ссылки-хвосты с ником (или без него, если ник ещё не введён).
@@ -214,7 +217,8 @@ def po_send(req):
 
     if req.form.get("back") == "simple":
         return Response.redirect("/chat/simple?nick=" + urllib.parse.quote(nick))
-    # Страница 1 = самые свежие, чтобы только что отправленное было видно.
+    # Страница 1 = самые свежие; внутри страницы новые сверху,
+    # поэтому только что отправленное видно первым.
     return Response.redirect("/chat/frame?page=1&nick=" + urllib.parse.quote(nick))
 
 
